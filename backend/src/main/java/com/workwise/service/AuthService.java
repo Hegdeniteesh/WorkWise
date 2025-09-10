@@ -41,14 +41,15 @@ public class AuthService {
         }
 
         // Encrypt password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String rawPassword = user.getPassword();
+        user.setPassword(passwordEncoder.encode(rawPassword));
 
         // Save user
         User savedUser = userRepository.save(user);
 
-        // Generate JWT token
+        // Authenticate with saved email and raw password
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(savedUser.getEmail(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(savedUser.getEmail(), rawPassword)
         );
 
         return jwtUtils.generateJwtToken(authentication);
@@ -68,4 +69,5 @@ public class AuthService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("User not found"));
     }
+
 }
