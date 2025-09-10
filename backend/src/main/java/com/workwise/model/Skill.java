@@ -90,4 +90,12 @@ public class Skill {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
