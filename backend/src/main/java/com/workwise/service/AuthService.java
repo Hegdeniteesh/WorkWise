@@ -59,17 +59,14 @@ public class AuthService {
         return jwtUtils.generateJwtToken(authToken);
     }
 
-    // MISSING METHOD 1: Add this method
     public String loginUser(String email, String password) throws Exception {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtUtils.generateJwtToken(authentication);
     }
 
-    // MISSING METHOD 2: Add this method
     public User getUserFromToken(String token) throws Exception {
         String email = jwtUtils.getUserNameFromJwtToken(token);
         return userRepository.findByEmail(email)

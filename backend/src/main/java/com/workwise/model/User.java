@@ -149,4 +149,56 @@ public class User {
         skills.remove(skill);
         skill.setUser(null);
     }
+
+    // --- Explicit Getters and Setters ---
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public UserType getUserType() { return userType; }
+    public void setUserType(UserType userType) { this.userType = userType; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getPreferredLanguage() { return preferredLanguage; }
+    public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
+
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public Boolean getAvailabilityStatus() { return availabilityStatus; }
+    public void setAvailabilityStatus(Boolean availabilityStatus) { this.availabilityStatus = availabilityStatus; }
+
+    public Double getTrustScore() { return trustScore; }
+    public void setTrustScore(Double trustScore) { this.trustScore = trustScore; }
+
+    public Boolean getIsVerified() { return isVerified; }
+    public void setIsVerified(Boolean isVerified) { this.isVerified = isVerified; }
 }
