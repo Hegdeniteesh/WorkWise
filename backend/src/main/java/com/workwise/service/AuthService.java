@@ -41,33 +41,22 @@ public class AuthService {
         }
 
         // Encrypt password
-        String rawPassword = user.getPassword();
-        user.setPassword(passwordEncoder.encode(rawPassword));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // Save user
         User savedUser = userRepository.save(user);
 
-        // Authenticate with saved email and raw password
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(savedUser.getEmail(), rawPassword)
-        );
+        // Generate token directly without authentication step
+        UserDetailsImpl userDetails = UserDetailsImpl.build(savedUser);
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
 
-        return jwtUtils.generateJwtToken(authentication);
+        return jwtUtils.generateJwtToken(authToken);
     }
 
-    public String loginUser(String email, String password) throws Exception {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return jwtUtils.generateJwtToken(authentication);
-    }
-
-    public User getUserFromToken(String token) throws Exception {
-        String email = jwtUtils.getUserNameFromJwtToken(token);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new Exception("User not found"));
-    }
 
 }
