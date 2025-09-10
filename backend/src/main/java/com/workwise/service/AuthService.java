@@ -12,8 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class AuthService {
 
@@ -40,8 +38,11 @@ public class AuthService {
             throw new Exception("Phone number is already registered");
         }
 
+        // Store raw password before encoding
+        String rawPassword = user.getPassword();
+
         // Encrypt password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(rawPassword));
 
         // Save user
         User savedUser = userRepository.save(user);
@@ -58,5 +59,20 @@ public class AuthService {
         return jwtUtils.generateJwtToken(authToken);
     }
 
+    // MISSING METHOD 1: Add this method
+    public String loginUser(String email, String password) throws Exception {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
 
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return jwtUtils.generateJwtToken(authentication);
+    }
+
+    // MISSING METHOD 2: Add this method
+    public User getUserFromToken(String token) throws Exception {
+        String email = jwtUtils.getUserNameFromJwtToken(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("User not found"));
+    }
 }
