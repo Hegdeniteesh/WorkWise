@@ -115,7 +115,7 @@ body {
 .auth-card {
   background: white;
   border-radius: 15px;
-  padding: 40px;
+  padding: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
 }

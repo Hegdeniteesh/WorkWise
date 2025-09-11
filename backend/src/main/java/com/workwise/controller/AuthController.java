@@ -21,9 +21,16 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    // ✅ Unified register endpoint with debug logs
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user) {
         try {
+            // Debug logs
+            System.out.println("Registration request received");
+            System.out.println("User email: " + user.getEmail());
+            System.out.println("Password is null: " + (user.getPassword() == null));
+            System.out.println("Password is empty: " + (user.getPassword() != null && user.getPassword().isEmpty()));
+
             String token = authService.registerUser(user);
 
             Map<String, Object> response = new HashMap<>();
@@ -35,6 +42,7 @@ public class AuthController {
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            e.printStackTrace();
             Map<String, String> error = new HashMap<>();
             error.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -69,9 +77,8 @@ public class AuthController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-            User user = authService.getUserFromToken("dummy"); // Will be improved
+            User user = authService.getUserFromToken("dummy"); // TODO: Replace with real token logic
 
-            // Return user without password
             Map<String, Object> profile = new HashMap<>();
             profile.put("id", userDetails.getId());
             profile.put("name", userDetails.getName());
@@ -95,7 +102,6 @@ public class AuthController {
         private String email;
         private String password;
 
-        // Getters and setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }
