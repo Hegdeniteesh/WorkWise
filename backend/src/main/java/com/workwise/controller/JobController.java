@@ -1,5 +1,4 @@
 package com.workwise.controller;
-
 import com.workwise.model.Job;
 import com.workwise.model.JobStatus;
 import com.workwise.model.SkillCategory;
@@ -18,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,7 +28,6 @@ import java.util.Optional;
 @RequestMapping("/api/jobs")
 @CrossOrigin(origins = "http://localhost:3000")
 public class JobController {
-
     @Autowired
     private JobRepository jobRepository;
 
@@ -366,7 +363,7 @@ public class JobController {
 
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
+            Map<String, Object> error = new HashMap<>(); // ✅ FIXED: Changed from Map<String, String> to Map<String, Object>
             error.put("error", "Failed to fetch stats: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
