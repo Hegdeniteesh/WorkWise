@@ -47,16 +47,14 @@ public class AuthService {
         // Save user
         User savedUser = userRepository.save(user);
 
-        // Generate token directly without authentication step
-        UserDetailsImpl userDetails = UserDetailsImpl.build(savedUser);
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
 
-        return jwtUtils.generateJwtToken(authToken);
+        // Authenticate using the original raw password to generate a token for auto-login
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(savedUser.getEmail(), rawPassword)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return jwtUtils.generateJwtToken(authentication);
     }
 
     public String loginUser(String email, String password) throws Exception {
