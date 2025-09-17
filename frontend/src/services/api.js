@@ -74,4 +74,11 @@ export const healthAPI = {
   health: () => api.get('/users/health'),
 };
 
+// Matching/AI API calls
+export const matchingAPI = {
+  getRecommendations: () => api.get('/matching/recommendations'),
+  getWorkersForJob: (jobId) => api.get(`/matching/job/${jobId}/workers`),
+  getRecommendationsForWorker: (workerId) => api.get(`/matching/worker/${workerId}/recommendations`),
+};
+
 export default api;
