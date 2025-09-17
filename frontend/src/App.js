@@ -218,6 +218,23 @@ function App() {
       </footer>
     </div>
   );
+
+  // Add to the existing App.js navigation tabs
+  const navTabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
+    { id: 'jobs', label: 'Find Jobs', icon: '🔍' },
+    { id: 'ai-recommendations', label: 'AI Matches', icon: '🤖' },
+    ...(user.userType === 'HIRER' || user.userType === 'BOTH' ?
+      [{ id: 'post-job', label: 'Post Job', icon: '📝' }] : []
+    ),
+    { id: 'profile', label: 'Profile', icon: '👤' }
+  ];
+
+  // Add to the main content rendering
+  {activeTab === 'ai-recommendations' && (
+    <JobRecommendations user={user} />
+  )}
+
 }
 
 export default App;
