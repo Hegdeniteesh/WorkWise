@@ -27,4 +27,10 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     @Query("SELECT AVG(r.punctuality) FROM Rating r WHERE r.ratedUser.id = :userId AND r.punctuality IS NOT NULL")
     Double getAveragePunctualityForUser(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(r) FROM Rating r WHERE r.ratedUser.id = :userId AND r.wouldRecommend = true")
+    Long getRecommendationCount(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(r) FROM Rating r WHERE r.ratedUser.id = :userId")
+    Long getTotalRatingCount(@Param("userId") Long userId);
 }
