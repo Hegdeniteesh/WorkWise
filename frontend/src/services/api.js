@@ -89,4 +89,15 @@ export const ratingAPI = {
   getMyReviews: () => api.get('/ratings/my-reviews'),
 };
 
+export const enhancedJobAPI = {
+  ...jobAPI, // Inherit existing job API methods
+  apply: (jobId) => api.put(`/jobs/${jobId}/apply`),
+  updateStatus: (jobId, status) => api.put(`/jobs/${jobId}/status`, { status }),
+  getMyJobs: () => api.get('/jobs/my-jobs'),
+  getAssignedJobs: () => api.get('/jobs/assigned-to-me'),
+  searchAdvanced: (filters) => {
+    const params = new URLSearchParams(filters);
+    return api.get(`/jobs/search?${params}`);
+  },
+};
 export default api;
