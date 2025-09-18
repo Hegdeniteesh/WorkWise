@@ -18,7 +18,7 @@ const DashboardLayout = () => {
              <div className="dashboard-layout">
                  <aside className="sidebar">
                      <div className="sidebar-header">
-                         <NavLink to="/" className="sidebar-brand">🚀 WorkWise</NavLink>
+                         <NavLink to="/" className="sidebar-brand">WorkWise</NavLink>
                      </div>
                      <nav className="sidebar-nav">
                          <NavLink to="/dashboard/home" className="sidebar-link">Dashboard</NavLink>
