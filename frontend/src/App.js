@@ -1,240 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import UserProfile from './components/Dashboard/UserProfile';
-import PostJob from './components/Jobs/PostJob';
-import JobSearch from './components/Jobs/JobSearch';
-import { healthAPI } from './services/api';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+
+// Import Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardLayout from './pages/Dashboard/DashboardLayout';
+import DashboardHome from './pages/Dashboard/DashboardHome';
+import JobSearchPage from './pages/Dashboard/JobSearchPage';
+import PostJobPage from './pages/Dashboard/PostJobPage';
+import ProfilePage from './pages/Dashboard/ProfilePage';
+import MyJobsPage from './pages/Dashboard/MyJobsPage';
+
 import './App.css';
 
+// Protected Route Component
+const ProtectedRoute = () => {
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="loading-screen">
+                <div className="loading-spinner"></div>
+                <p>Loading WorkWise...</p>
+            </div>
+        );
+    }
+
+    return user ? <Outlet /> : <Navigate to="/login" />;
+};
+
 function App() {
-  const [user, setUser] = useState(null);
-  const [currentView, setCurrentView] = useState('login');
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [loading, setLoading] = useState(true);
-  const [backendStatus, setBackendStatus] = useState(null);
+    const { user } = useAuth();
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const savedUser = localStorage.getItem('workwise_user');
-    const savedToken = localStorage.getItem('workwise_token');
-
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-      setCurrentView('dashboard');
-    }
-
-    // Check backend connectivity
-    checkBackendHealth();
-
-    setLoading(false);
-  }, []);
-
-  const checkBackendHealth = async () => {
-    try {
-      const response = await healthAPI.health();
-      setBackendStatus(response.data);
-    } catch (error) {
-      console.error('Backend connection failed:', error);
-      setBackendStatus({ status: 'DOWN', error: 'Connection failed' });
-    }
-  };
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-    setCurrentView('dashboard');
-    setActiveTab('dashboard');
-  };
-
-  const handleRegister = (userData) => {
-    setUser(userData);
-    setCurrentView('dashboard');
-    setActiveTab('dashboard');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('workwise_token');
-    localStorage.removeItem('workwise_user');
-    setUser(null);
-    setCurrentView('login');
-    setActiveTab('dashboard');
-  };
-
-  const handleJobPosted = (jobData) => {
-    alert('Job posted successfully!');
-    setActiveTab('jobs');
-  };
-
-  const handleJobSelect = (job) => {
-    // You can implement a job detail modal or page here
-    console.log('Selected job:', job);
-  };
-
-  if (loading) {
     return (
-      <div className="loading-screen">
-        <div className="loading-spinner"></div>
-        <p>Loading WorkWise...</p>
-      </div>
+        <Router>
+            <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+                <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+
+                {/* Protected Dashboard Routes */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/dashboard" element={<DashboardLayout />}>
+                        <Route index element={<Navigate to="home" replace />} />
+                        <Route path="home" element={<DashboardHome />} />
+                        <Route path="find-jobs" element={<JobSearchPage />} />
+                        <Route path="post-job" element={<PostJobPage />} />
+                        <Route path="my-jobs" element={<MyJobsPage />} />
+                        <Route path="profile" element={<ProfilePage />} />
+                    </Route>
+                </Route>
+
+                 {/* Fallback Route */}
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+        </Router>
     );
-  }
-
-  // If user is logged in, show dashboard with tabs
-  if (user) {
-    return (
-      <div className="app-dashboard">
-        <header className="dashboard-nav">
-          <div className="nav-brand">
-            <h1>🚀 WorkWise</h1>
-          </div>
-
-          <nav className="nav-tabs">
-            <button
-              className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              Dashboard
-            </button>
-
-            <button
-              className={`nav-tab ${activeTab === 'jobs' ? 'active' : ''}`}
-              onClick={() => setActiveTab('jobs')}
-            >
-              Find Jobs
-            </button>
-
-            {(user.userType === 'HIRER' || user.userType === 'BOTH') && (
-              <button
-                className={`nav-tab ${activeTab === 'post-job' ? 'active' : ''}`}
-                onClick={() => setActiveTab('post-job')}
-              >
-                Post Job
-              </button>
-            )}
-
-            <button
-              className={`nav-tab ${activeTab === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveTab('profile')}
-            >
-              Profile
-            </button>
-          </nav>
-
-          <button onClick={handleLogout} className="btn-logout">
-            Logout
-          </button>
-        </header>
-
-        <main className="dashboard-main">
-          {activeTab === 'dashboard' && (
-            <UserProfile user={user} onLogout={handleLogout} />
-          )}
-
-          {activeTab === 'jobs' && (
-            <JobSearch onJobSelect={handleJobSelect} />
-          )}
-
-          {activeTab === 'post-job' && (
-            <PostJob
-              onJobPosted={handleJobPosted}
-              onCancel={() => setActiveTab('dashboard')}
-            />
-          )}
-
-          {activeTab === 'profile' && (
-            <div className="profile-settings">
-              <h2>Profile Settings</h2>
-              <p>Profile management features coming in Day 5!</p>
-            </div>
-          )}
-        </main>
-      </div>
-    );
-  }
-
-  // Show authentication screens
-  return (
-    <div className="App">
-      <div className="app-header">
-        <div className="brand">
-          <h1>🚀 WorkWise</h1>
-          <p>India's Leading Labor Marketplace Platform</p>
-        </div>
-
-        {backendStatus && (
-          <div className={`backend-status ${backendStatus.status.toLowerCase()}`}>
-            <div className="status-indicator">
-              {backendStatus.status === 'UP' ? '🟢' : '🔴'}
-            </div>
-            <div className="status-info">
-              <span>Backend: {backendStatus.status}</span>
-              {backendStatus.totalUsers !== undefined && (
-                <small>{backendStatus.totalUsers} users registered</small>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <main className="app-main">
-        {currentView === 'login' ? (
-          <Login
-            onLogin={handleLogin}
-            switchToRegister={() => setCurrentView('register')}
-          />
-        ) : (
-          <Register
-            onRegister={handleRegister}
-            switchToLogin={() => setCurrentView('login')}
-          />
-        )}
-      </main>
-
-      <footer className="app-footer">
-        <div className="feature-highlights">
-          <div className="feature">
-            <span className="icon">🌾</span>
-            <span>Agricultural Workers</span>
-          </div>
-          <div className="feature">
-            <span className="icon">🏗️</span>
-            <span>Construction Labor</span>
-          </div>
-          <div className="feature">
-            <span className="icon">🏠</span>
-            <span>Domestic Services</span>
-          </div>
-          <div className="feature">
-            <span className="icon">🤖</span>
-            <span>AI-Powered Matching</span>
-          </div>
-          <div className="feature">
-            <span className="icon">🌍</span>
-            <span>Multi-Language Support</span>
-          </div>
-        </div>
-
-        <p>&copy; 2025 WorkWise - Connecting Workers, Creating Opportunities</p>
-      </footer>
-    </div>
-  );
-
-  // Add to the existing App.js navigation tabs
-  const navTabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
-    { id: 'jobs', label: 'Find Jobs', icon: '🔍' },
-    { id: 'ai-recommendations', label: 'AI Matches', icon: '🤖' },
-    ...(user.userType === 'HIRER' || user.userType === 'BOTH' ?
-      [{ id: 'post-job', label: 'Post Job', icon: '📝' }] : []
-    ),
-    { id: 'profile', label: 'Profile', icon: '👤' }
-  ];
-
-  // Add to the main content rendering
-  {activeTab === 'ai-recommendations' && (
-    <JobRecommendations user={user} />
-  )}
-
 }
 
 export default App;
