@@ -1,9 +1,9 @@
 import React from 'react';
-import JobSearch from '../../components/Jobs/JobSearch'; // Your existing component
+import JobSearch from '../../components/Jobs/JobSearch';
 
 const JobSearchPage = () => {
     const handleJobSelect = (job) => {
-        // Here you can implement a modal to show job details
+        // modal to show job details
         console.log("Selected Job:", job);
         alert(`You selected "${job.title}"`);
     };
